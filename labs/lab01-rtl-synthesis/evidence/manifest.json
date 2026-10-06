@@ -1,0 +1,209 @@
+{
+  "scope": "Copied source/evidence/report artifacts; generated documentation and templates are described separately",
+  "files": [
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/source/code.txt",
+      "source_filename": "code.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "af755ae373f5b548c3a668a563364bb11f2b89d149877f28cafdb4d66e54c8d6"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/area.txt",
+      "source_filename": "area.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "3d061f1c21247cb9221c6375080f768e48e989956271a3ef679555272ba33fa7"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/clocks.txt",
+      "source_filename": "clocks.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "8ff039e9325967cec80d949d1984000acfd7554021e469f89cc62df538c62746"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/constraints-lint.txt",
+      "source_filename": "constraints.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "686bcf6c32b238e1235f209bb48475c8071f593aaa730e8d297f64f3b77e0962"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/design-rules.txt",
+      "source_filename": "design_rules.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "c314993542bac78eec9fb5ce8e983d0b97917b44e8bc8f9c39e365bd4d8ab586"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/ports.txt",
+      "source_filename": "port_final.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "c19fad9dd17073d6cab3e7deff9456e11bf7c9a613b2137b1a7a4e9b169d393d"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/power-earlier.txt",
+      "source_filename": "power.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "f58c9a061a5a04cef4c1fab81d22c87209f326c4c0e934472ba793ea6256e31d"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/timing.txt",
+      "source_filename": "timing.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "51a73fe00e65b08a849738efb7ef086313c0f2c5401b14a2f003a5304573b9fa"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/area.png",
+      "source_filename": "area.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "f0cb44d4fa272f2dfb9673e99aa0ad14a3832a5f3e7c9b1b7e3fba0ec9416e71"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/clocks.png",
+      "source_filename": "clock.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "db7f1a4d5c3ef105c267887bf8a2864f17219d2f397bb2f17e748f52cc1eb17a"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/constraints-lint-details.png",
+      "source_filename": "Constraint-lint_1.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "e627d29be7e9b0d3caa9b89f49bfb1497bf5c4bd190c43e79a134f462b8f4e1e"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/constraints-lint-summary.png",
+      "source_filename": "Constraint-lint2.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "bd6da47370f497626a83df4313998475c3a15a3fe6ef51db13b4ce8f64fbc001"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/baseline8/design-rules.png",
+      "source_filename": "design_rules.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "525538da2df225a95f405801103fbba595c3b8b72afc01cf0668be535d55905e"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/area.png",
+      "source_filename": "area32.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "c6c82d3c1d08c2ddf778978cddb58651a417a58c77efa0c8382b9ec25d3fbbdf"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/clocks.png",
+      "source_filename": "clock_32.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "101f05d938fc62c38ae9ae94cdb4ef2d9a70132e3137f8abf2333c894f87f468"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/constraints-lint-details.png",
+      "source_filename": "Constraint-lint_1_32.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "1fc21bc4e01b194f545fdf575d5b7c652c9e37cf1704020d07fb8939ac7ddb89"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/constraints-lint-summary.png",
+      "source_filename": "Constraint-lint_2_32.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "014488cde1318d3451631fb086bc549954099a4b6635fa0144489f2fd1e98bd0"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/design-rules.png",
+      "source_filename": "design_rules_32.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "66082755344791804d4840421186f30cc973eb67aecb9bd5e6d371a65ca3c182"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/width32/timing.txt",
+      "source_filename": "timing_32.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "b4507367eb73f98116ea0fec3344e63f0ceba61f07864968821234e8c305be25"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/clock50-load52/area.png",
+      "source_filename": "Screenshot 2026-10-05 144236.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "acdc79803a5fc3bb1cb8bc24c46d4a22205b53f4cf1390d5c624f4bd9a81fd80"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/clock50-load52/clocks.png",
+      "source_filename": "Screenshot 2026-10-05 144246.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "19e2b5382b9ac4d1e3f229f1971c6bf7c23a78d5b7ca4ebbddd97086ec5ff460"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/clock50-load52/constraints-lint-details.png",
+      "source_filename": "Screenshot 2026-10-05 144309.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "b5b97100aea459dd7b3a4995f6a3dd33252e5dd85a7934a0c6489666d6a18e72"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/clock50-load52/design-rules.png",
+      "source_filename": "Screenshot 2026-10-05 144325.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "2eb40a817433c7db29675cf4836dd60f4e4eb105c45e77b75f8584e49011d63a"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/clock50-load52/timing.txt",
+      "source_filename": "timing_step9.txt",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "04dffc588ad4d71ccc70fea1fd0e3dabf453517e62ecf6a0bfd601d4a08faf01"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/design/export-and-reports.png",
+      "source_filename": "Screenshot 2026-10-05 141555.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "ccf0d46acdf44b51ecd11670461fbd78bc3ff1ed1fa05dcf1b48129955e4886d"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/design/uart-top-schematic.png",
+      "source_filename": "Screenshot 2026-10-05 144957.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "bb3247f0fb58433085dd5c9d251c2542b11f90298d7a41bf0247d23e694e3794"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/design/transceiver-hierarchy.png",
+      "source_filename": "Screenshot 2026-10-05 145236.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "6fdbd4567a0d610de333576483eceb11fcbc284e47f8f5cb29fa3c6873a8b40d"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/design/tx-wrapper.png",
+      "source_filename": "Screenshot 2026-10-05 145417.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "30111193df3be16200d2159d744531c7a76f79f54e89338656d5a7c680c488be"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/design/sampling-tick-mapped.png",
+      "source_filename": "Screenshot 2026-10-05 145722.png",
+      "treatment": "Unmodified supplied evidence",
+      "sha256": "4b46295b70ffee837ea4264ee8e8bf9b59c64a7824ff2833843b49d0dfbd0e21"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/netlists/uart_top_8bit_earlier.v",
+      "source_filename": "uart_top.txt",
+      "treatment": "Renamed earlier mapped export; contents unchanged",
+      "sha256": "e96d0679c3124acb0e22d18743be40d77941c411da3dc725614cb6fae4e8a5fd"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/console/library-setup.txt",
+      "source_filename": "step1-2.txt",
+      "treatment": "Account workspace paths replaced with <CADENCE_WORKSPACE>; otherwise captured transcript",
+      "sha256": "3ea824f64dbff0a9237476eda1b784df5398764ff9abcd662b66dd07da31e9de"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/evidence/console/initial-synthesis.txt",
+      "source_filename": "step3.txt",
+      "treatment": "Account workspace paths replaced with <CADENCE_WORKSPACE>; otherwise captured transcript",
+      "sha256": "11773797d92d842ee4d2a362f416372c1716e28bc6a858ee33de949154da9e98"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/report/220511N_Lab1_RTL_Synthesis_Report.pdf",
+      "source_filename": "220511N_Lab1_RTL_Synthesis_Report.pdf",
+      "treatment": "Completed report copied unchanged",
+      "sha256": "7c5f1ae4c8f7a884cff93cb0faa0fc7ad3e5ec67234ea68f7b75d41fd5fa677d"
+    },
+    {
+      "file": "labs/lab01-rtl-synthesis/report/220511N_Lab1_RTL_Synthesis_Report.docx",
+      "source_filename": "220511N_Lab1_RTL_Synthesis_Report.docx",
+      "treatment": "Completed report copied unchanged",
+      "sha256": "d9350944c11455969d445e2345df2559927b25dde8ddf6350838c7b9ac44e9fb"
+    }
+  ]
+}

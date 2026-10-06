@@ -1,0 +1,4 @@
+experiment,tx_rx_word_length_bits,physical_clock_mhz,period_ns,duty_cycle_percent,clock_b_offset_ns,external_load_pf,cell_count,cell_area_um2,estimated_net_area_um2,reported_total_area_um2,worst_supplied_late_slack_ns,registers_per_clock,transition_violation_cost,area_evidence,timing_evidence,clock_evidence,transition_evidence
+baseline8,8,100,10,50,0,0.2,772,2220.948,946.493,3167.441,2.539,83,439,evidence/baseline8/area.txt,evidence/baseline8/timing.txt,evidence/baseline8/clocks.txt,evidence/baseline8/design-rules.txt
+width32,32,100,10,50,0,0.2,1130,4010.292,1403.47,5413.762,2.031,153,1318,evidence/width32/area.png,evidence/width32/timing.txt,evidence/width32/clocks.png,evidence/width32/design-rules.png
+clock50_load52,32,50,20,40,10,5.2,1128,3807.144,1401.987,5209.131,8.864,153,489032,evidence/clock50-load52/area.png,evidence/clock50-load52/timing.txt,evidence/clock50-load52/clocks.png,evidence/clock50-load52/design-rules.png

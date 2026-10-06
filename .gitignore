@@ -1,0 +1,36 @@
+# Local EDA runs and proprietary technology inputs
+/work/
+**/libs/
+**/technology/
+*.lib
+*.lef
+*.tch
+*.qrc
+# Runtime databases, caches, and tool session files
+*.log
+*.jou
+*.cmd
+*.db
+*.dat
+*.enc
+*.enc.dat/
+*.innovus/
+*.genus/
+*.bak
+*.swp
+*.swo
+__pycache__/
+*.py[cod]
+.venv/
+Thumbs.db
+Desktop.ini
+.DS_Store
+# Remote access and private local configuration
+credentials*
+**/credentials*
+.env
+.env.*
+*.pem
+*.key
+# Curated evidence uses .txt and stays tracked.
+# Add selected later .log reports with git add -f, or archive as .txt.

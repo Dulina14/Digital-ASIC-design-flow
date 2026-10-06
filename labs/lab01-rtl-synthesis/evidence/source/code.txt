@@ -1,0 +1,885 @@
+`timescale 1ns / 1ps
+module rx_fsm#
+(	
+	parameter  NO_OF_DATA_BITS =8, 		 //6,7,8
+	parameter  PARITY_ENABLED  ="TRUE",  //"FALSE", "TRUE"
+	parameter  PARITY_TYPE     ="ODD",   // "ODD", "EVEN"
+	parameter  NO_OF_STOP_BITS ="2"		 //"0" "1" "1.5" "2"
+)
+(  
+ input 	clk,
+ input 	reset,
+
+ input  sampling_tick_middle,
+ input 	sampling_tick_end,
+ output reg tick_start,
+	 
+ input	rx_data,
+ output reg data_out_to_buffer,
+ output reg data_valid_to_buffer,
+ output reg parity_error,
+ output reg stop_bit_error
+);
+	 
+
+	reg[2:0]   data_bit_counter; 
+	reg parity;
+
+   localparam IDLE 			= 4'b0000;
+   localparam START_BIT 	= 4'b0001;
+   localparam DATA_BITS 	= 4'b0010;
+   localparam PARITY	   	= 4'b0011;
+   localparam STOP_BITS 	= 4'b0100;
+   localparam STOP_BITS1_5 = 4'b0101;
+   localparam STOP_BITS2 	= 4'b0110;
+   localparam DONE      	= 4'b0111;
+
+   reg [3:0]  state;
+	//assign debug=state;
+   always@(posedge clk) begin	
+      if (reset) begin
+         state 				<= IDLE;
+			tick_start			<=1'b0;
+			data_out_to_buffer  <=1'b0;
+		   data_valid_to_buffer<=1'b0;
+			data_bit_counter	<=3'b000;
+			parity 				<=1'b0;
+			parity_error		<=1'b0;
+			stop_bit_error		<=1'b0;
+      end
+      else begin
+         case (state)
+            IDLE : begin
+               if (~rx_data)begin
+                  state 		<= START_BIT;
+						tick_start	<=1'b1;
+					end
+               else begin
+                  state <= IDLE;
+					end
+					data_out_to_buffer  <=1'b0;
+					data_valid_to_buffer<=1'b0;
+					data_bit_counter	<=3'b000;
+					parity 				<=1'b0;
+					parity_error		<=1'b0;
+					stop_bit_error		<=1'b0;
+            end
+            START_BIT : begin
+               if (sampling_tick_middle)
+                  state <= DATA_BITS;
+               else
+                  state <= START_BIT;
+            end
+            DATA_BITS : begin
+               if (sampling_tick_middle && data_bit_counter<(NO_OF_DATA_BITS-1))begin
+						data_out_to_buffer<=rx_data;
+						data_valid_to_buffer<=1'b1;
+                  data_bit_counter<=data_bit_counter+3'b001;
+						state <=DATA_BITS;
+						if(PARITY_ENABLED=="TRUE")
+							parity<=parity^rx_data;
+					end
+               else if (sampling_tick_middle && data_bit_counter==(NO_OF_DATA_BITS-1))begin
+						data_out_to_buffer<=rx_data;	
+						data_valid_to_buffer<=1'b1;						
+						if(PARITY_ENABLED=="TRUE")begin
+							state <= PARITY;
+							parity<=parity^rx_data;
+						end
+						else if(NO_OF_STOP_BITS=="0")
+							state <=DONE;//
+						else
+							state <= STOP_BITS;
+					end
+               else begin
+                  state <= DATA_BITS;
+						data_valid_to_buffer<=1'b0;
+					end
+            end
+				PARITY   :begin
+					if (sampling_tick_middle)begin
+						data_valid_to_buffer<=1'b0;
+						parity_error<=(PARITY_TYPE!="ODD")?((parity==rx_data)?1'b0:1'b1):((~parity==rx_data)?1'b0:1'b1);
+						if(NO_OF_STOP_BITS=="0")
+							state <=DONE;//
+						else
+							state  <=STOP_BITS;
+					end
+					else begin
+						state<=PARITY;
+						data_valid_to_buffer<=1'b0;
+					end
+				end
+            STOP_BITS: begin					
+					if (sampling_tick_middle)begin
+						stop_bit_error <=(rx_data)?1'b0:1'b1;
+						if (NO_OF_STOP_BITS=="1")begin
+							state <= DONE;//
+						end
+						else if (NO_OF_STOP_BITS=="1.5")
+							state <= STOP_BITS1_5;
+						else if (NO_OF_STOP_BITS=="2")
+							state <=STOP_BITS2;
+					end
+               else begin
+                  state <=STOP_BITS;
+						data_valid_to_buffer<=1'b0;	
+						parity_error<=1'b0;	
+					end
+            end
+				STOP_BITS1_5:begin
+						if(sampling_tick_end)begin
+							state <= DONE;//
+							stop_bit_error <=(rx_data)?1'b0:1'b1;
+						end
+						else begin
+							state <=STOP_BITS1_5;
+							stop_bit_error <=1'b0;
+						end
+					end
+				STOP_BITS2:begin
+						if(sampling_tick_middle)begin
+							state <= DONE;//
+							stop_bit_error <=(rx_data)?1'b0:1'b1;
+						end
+						else begin
+							state <=STOP_BITS2;
+							stop_bit_error <=1'b0;
+						end
+					end
+				DONE:begin
+						if(sampling_tick_end)
+							state <= IDLE;
+						else  begin
+							state <=DONE;
+							stop_bit_error <=1'b0;
+							parity_error<=1'b0;
+						end
+					end
+         endcase
+	end
+
+end
+endmodule
+
+
+`timescale 1ns / 1ps
+
+module rx_buffer#(
+	parameter WORD_SIZE=8,
+	parameter NO_OF_WORDS=1
+)
+(
+    input clk,
+    input reset,
+	 
+    input data_serial_wr_en,
+    input data_serial_in,	 
+	 
+    input  data_parallel_rd_enable,
+    output reg [WORD_SIZE*NO_OF_WORDS-1:0]  data_parallel_out,
+    output buffer_full
+);
+
+localparam WIDTH=WORD_SIZE*NO_OF_WORDS;
+localparam COUNTER_WIDTH=logb2(WIDTH+1);
+
+reg[COUNTER_WIDTH-1:0] buffer_full_counter;
+reg[WIDTH-1:0] memory;
+
+
+function integer logb2;
+  input [31:0] in;
+  integer i;
+  begin
+    i = in;
+      for(logb2=1; i>0; logb2=logb2+1)
+        i = i >> 1;
+  end
+endfunction
+
+
+
+always@(posedge clk)begin
+	if(reset)begin
+			data_parallel_out <={{WIDTH}{1'b0}};
+	end
+	else if(data_parallel_rd_enable) begin
+		  data_parallel_out<=memory;
+	end
+end
+
+integer j;
+always@(posedge clk)begin
+	if(reset)begin
+		for (j = 0; j <WIDTH; j = j + 1)
+			memory[0] <=1'b0;		
+	end
+	else if(data_serial_wr_en) begin
+		memory[WIDTH-1] <=data_serial_in;
+		for (j = WIDTH-1; j >0; j = j - 1) begin: SHIFT
+            memory[j-1] <=memory[j]; 
+		end
+	end		
+end
+
+
+always@(posedge clk)
+begin
+	if(reset)begin
+		buffer_full_counter<={{COUNTER_WIDTH}{1'b0}};
+	end
+	else begin
+		if(data_serial_wr_en && buffer_full_counter<WIDTH)
+			buffer_full_counter<=buffer_full_counter+{{{COUNTER_WIDTH-1}{1'b0}},1'b1};		
+		else if(data_parallel_rd_enable)
+			buffer_full_counter<={{COUNTER_WIDTH}{1'b0}};
+	end
+end
+
+assign buffer_full=(buffer_full_counter==WIDTH)?1'b1:1'b0;
+
+
+endmodule
+
+`timescale 1ns / 1ps
+module rx_wrapper#(
+	parameter  NO_OF_WORS_IN_BUFFER =2,
+	
+	parameter  NO_OF_DATA_BITS =7, 		 //6,7,8
+	parameter  PARITY_ENABLED  ="TRUE",  //"FALSE", "TRUE"
+	parameter  PARITY_TYPE     ="EVEN",   // "ODD", "EVEN"
+	parameter  NO_OF_STOP_BITS	="2",		 //"0" "1" "1.5" "2"
+	
+	parameter  BAUD 			=2400,
+	parameter  CLOCK_IN_MHZ	=100
+)
+(
+		input 	clk,
+      input 	reset,
+		input    rx_data,	
+
+		
+		
+		output[NO_OF_WORS_IN_BUFFER*NO_OF_DATA_BITS-1:0] data_parallel_out,
+		input  data_parallel_rd_enable,
+		output rx_buffer_full,
+		output parity_error,
+      output stop_bit_error
+	 
+    );
+	 
+
+	 
+	 
+wire 	 sampling_tick_middle,sampling_tick_end,tick_start;
+wire   data_out_to_buffer;
+wire   data_valid_to_buffer;
+
+
+rx_fsm#(
+	.NO_OF_DATA_BITS(NO_OF_DATA_BITS),
+	.PARITY_ENABLED(PARITY_ENABLED),
+	.PARITY_TYPE(PARITY_TYPE),
+	.NO_OF_STOP_BITS(NO_OF_STOP_BITS)
+) ins_rx_fsm (
+    .clk(clk), 
+    .reset(reset), 
+    .sampling_tick_middle(sampling_tick_middle), 
+    .sampling_tick_end(sampling_tick_end), 
+    .tick_start(tick_start), 
+    .rx_data(rx_data), 
+    .data_out_to_buffer(data_out_to_buffer), 
+    .data_valid_to_buffer(data_valid_to_buffer), 
+    .parity_error(parity_error),
+	 .stop_bit_error(stop_bit_error)
+    );
+
+
+sampling_tick_generator#
+(	
+	.BAUD(BAUD),
+	.CLOCK_IN_MHZ(CLOCK_IN_MHZ)
+)
+ ins_sampling_tick_generator (
+    .clk(clk), 
+    .reset(reset), 
+    .start(tick_start), 
+    .tick_16_8(sampling_tick_middle), 
+    .tick_16_16(sampling_tick_end)
+    );
+
+rx_buffer#
+(
+	.WORD_SIZE(NO_OF_DATA_BITS),
+	.NO_OF_WORDS(NO_OF_WORS_IN_BUFFER)
+) ins_rx_buffer (
+    .clk(clk), 
+    .reset(reset), 
+    .data_serial_in(data_out_to_buffer), 
+    .data_serial_wr_en(data_valid_to_buffer),
+	 .buffer_full(rx_buffer_full),
+    .data_parallel_out(data_parallel_out),
+	 .data_parallel_rd_enable(data_parallel_rd_enable)
+    );
+
+
+endmodule
+
+`timescale 1ns / 1ps
+module sampling_tick_generator#(
+	parameter BAUD 			=2400,
+	parameter CLOCK_IN_MHZ	=100
+)
+(
+ input clk,
+ input reset,
+ input start,
+ output reg tick_16_8,  // trick at every 16th of 16 times baud starting at 8th 
+ output reg tick_16_16  // trick at every 16th of 16 times baud starting at 16th 
+ );
+ 
+ localparam  integer SAMPLING_RATE=16*CLOCK_IN_MHZ*1000000/(BAUD*16);
+ localparam  integer SAMPLING_RATE_2x=SAMPLING_RATE/2;
+ localparam  COUNTER_WIDTH=logb2(SAMPLING_RATE-1);
+ 
+ 
+function integer logb2;
+  input [31:0] in;
+  integer i;
+  begin
+    i = in;
+      for(logb2=1; i>0; logb2=logb2+1)
+        i = i >> 1;
+  end
+endfunction
+
+
+ reg[COUNTER_WIDTH-1:0] counter;
+ always@(posedge clk)begin
+	if(reset)begin
+		counter<={{COUNTER_WIDTH}{1'b0}};
+		tick_16_16  <=1'b0;
+		tick_16_8<=1'b0;
+		//$display(SAMPLING_RATE_2x);
+	end
+	else begin
+		if(start) begin
+			if(counter<SAMPLING_RATE)begin
+				counter<=counter+{{{COUNTER_WIDTH-1}{1'b0}},1'b1};
+				   tick_16_16   <=1'b0;				
+				if(counter==SAMPLING_RATE_2x)
+					tick_16_8 <=1'b1;
+				else
+					tick_16_8 <=1'b0;
+			end
+			else begin
+				counter<={{COUNTER_WIDTH}{1'b0}};
+				tick_16_16  <=1'b1;
+			end
+		end 
+		else begin
+			counter<={{COUNTER_WIDTH}{1'b0}};
+			tick_16_16   <=1'b0;
+			tick_16_8    <=1'b0;
+		end
+	end
+ end
+
+
+endmodule
+
+`timescale 1ns / 1ps
+module tx_buffer#(
+	parameter WORD_SIZE	=8,     //shoud be same as the # of data bits in UART
+	parameter NO_OF_WORDS=1		  //buffer  multiple word transactions
+)
+(
+    input clk,
+    input reset,
+    input[WORD_SIZE*NO_OF_WORDS-1:0] data_parallel_in,
+	 input data_parallel_wr_enable,
+	 input data_serial_rd_enable,
+    output reg data_serial_out,
+	 output empty
+    );
+	 
+localparam WIDTH=WORD_SIZE*NO_OF_WORDS;
+localparam COUNTER_WIDTH=logb2(WIDTH+1);
+reg[COUNTER_WIDTH-1:0] buffer_empty_counter;
+reg[WIDTH-1:0] memory;
+
+function integer logb2;
+  input [31:0] in;
+  integer i;
+  begin
+    i = in;
+      for(logb2=1; i>0; logb2=logb2+1)
+        i = i >> 1;
+  end
+endfunction
+
+
+integer j;
+//write to memory parallely and read from memory serially
+always@(posedge clk)begin
+	if(reset)begin
+		data_serial_out<=1'b0;
+		for (j = 0; j <WIDTH; j = j + 1)
+			memory[j] <=1'b0;
+	end
+	if(data_serial_rd_enable)begin
+		data_serial_out<=memory[0];
+		for (j = 0; j <WIDTH-1; j = j + 1) begin: SHIFT
+				memory[j]<=memory[j+1];
+		end
+	end
+	else if(data_parallel_wr_enable)begin
+		memory<=data_parallel_in;
+	end
+end
+
+
+
+
+always@(posedge clk)begin
+	if(reset) 
+		buffer_empty_counter<=WIDTH;
+	else if(data_parallel_wr_enable)
+		buffer_empty_counter<=WIDTH;
+	else if(data_serial_rd_enable && buffer_empty_counter>{{COUNTER_WIDTH}{1'b0}})
+		buffer_empty_counter<=buffer_empty_counter - {{{COUNTER_WIDTH-1}{1'b0}},1'b1};
+end
+
+assign empty=(buffer_empty_counter=={{{COUNTER_WIDTH-1}{1'b0}},1'b0})?1'b1:1'b0;//
+
+endmodule
+
+`timescale 1ns / 1ps
+module tx_fsm#
+(	
+		parameter  NO_OF_DATA_BITS =8, 		 //6,7,8
+		parameter  PARITY_ENABLED  ="FALSE",  //"FALSE", "TRUE"
+		parameter  PARITY_TYPE     ="EVEN",   // "ODD", "EVEN"
+		parameter  NO_OF_STOP_BITS	="1"		 //"0" "1" "1.5" "2"
+)
+(
+	 input 		clk,
+    input 		reset,
+	 
+    input      empty,
+	 input  		sampling_tick_middle,
+    input  		sampling_tick_end,
+	 output reg tick_start,
+	 
+	 input      data_parallel_wr_enable,
+	 output reg tx_busy,
+	 output reg tx_data,
+	 output reg buffer_rd_enable,
+	 input      buffer_data
+    
+);
+
+
+   reg tem_buffer_data;
+	reg delay_data_parallel_wr_enable;
+	always@(posedge clk) begin
+		delay_data_parallel_wr_enable<=data_parallel_wr_enable;
+	end
+	
+	localparam IDLE 					= 4'b0000;
+   localparam START_BIT 			= 4'b0001;
+   localparam _GET_DATA_PRE0		= 4'b0010;
+   localparam _GET_DATA_PRE1		= 4'b0011;
+   localparam DATA_BITS 			= 4'b0100;
+   localparam PARITY	   			= 4'b0101;
+   localparam STOP_BITS 			= 4'b0110;
+   localparam STOP_BITSx 			= 4'b0111;
+   localparam DONE      			= 4'b1000;
+   localparam CHECK_BUFFER_EMPTY = 4'b1001;
+	
+	reg[2:0]   data_bit_counter; 
+	reg        parity;
+	reg [3:0]  state;
+	
+   always@(posedge clk) begin	
+      if (reset) begin
+			tx_data<=1'b1;
+			parity<=1'b0;
+			buffer_rd_enable<=1'b0;
+			tick_start<=1'b0;
+			tem_buffer_data<=1'b0;
+			data_bit_counter<=3'b000;
+			tx_busy<=1'b0;
+			state <= IDLE;
+		end
+		else begin
+			case(state)
+				IDLE:begin					
+					if(delay_data_parallel_wr_enable)begin
+						tick_start<=1'b1;
+						state <=START_BIT;
+						tx_busy<=1'b1;
+					end
+					else begin
+						tick_start<=1'b0;
+						tx_busy<=1'b0;
+						state <=IDLE;
+					end
+					tx_data<=1'b1;
+					parity<=1'b0;
+					tem_buffer_data<=1'b0;
+					data_bit_counter<=3'b000;					
+				end
+				START_BIT:begin
+						if(sampling_tick_middle)begin
+							tx_data<=1'b0;
+							state<=_GET_DATA_PRE0;
+							buffer_rd_enable<=1'b1;
+						end
+						else begin
+							state<=START_BIT;
+						end
+					end
+				_GET_DATA_PRE0:begin
+						buffer_rd_enable<=1'b0;
+						//tem_buffer_data <=buffer_data;
+						state<=_GET_DATA_PRE1;
+					end
+				_GET_DATA_PRE1:begin
+						buffer_rd_enable<=1'b0;
+						tem_buffer_data <=buffer_data;
+						state<=DATA_BITS;
+						if(PARITY_ENABLED=="TRUE")
+							parity<=parity^buffer_data;
+					end
+				DATA_BITS:begin
+						if(sampling_tick_middle && data_bit_counter<(NO_OF_DATA_BITS-1) )begin
+							tx_data<=tem_buffer_data;
+							state<=_GET_DATA_PRE0;
+							buffer_rd_enable<=1'b1;
+							data_bit_counter<=data_bit_counter+3'b001;
+						end
+						else if (sampling_tick_middle && data_bit_counter==(NO_OF_DATA_BITS-1))begin
+							tx_data<=tem_buffer_data;
+							//buffer_rd_enable<=1'b1;	
+							if(PARITY_ENABLED=="TRUE")begin
+								state <= PARITY;
+								//parity<=parity^buffer_data;
+							end
+							else if(NO_OF_STOP_BITS=="0")
+								state <=DONE;//
+							else
+								state <= STOP_BITS;
+							end
+						else begin
+							state<=DATA_BITS;
+						end
+					end
+				PARITY   :begin
+						if (sampling_tick_middle)begin
+								tx_data<=(PARITY_TYPE!="ODD")?parity:~parity;//parity;
+								if(NO_OF_STOP_BITS=="0")
+									state <=DONE;//
+								else
+									state  <=STOP_BITS;
+						end
+						else begin
+							state <= PARITY;
+						end						
+					end
+				STOP_BITS: begin
+						if (sampling_tick_middle)begin
+							tx_data<=1'b1;
+							if (NO_OF_STOP_BITS=="1")begin
+								state <= DONE;//							
+							end
+							else if (NO_OF_STOP_BITS=="1.5" || NO_OF_STOP_BITS=="2")
+								state <= STOP_BITSx;
+						end
+						else begin
+							state <=STOP_BITS;
+						end				
+					end
+				STOP_BITSx:begin
+					if(sampling_tick_middle)begin
+						state <= DONE;//
+					end
+					else begin
+						state <=STOP_BITSx;
+					end
+				end
+				DONE:begin
+						if(NO_OF_STOP_BITS!="1.5" && sampling_tick_middle)
+							state <= CHECK_BUFFER_EMPTY;
+						else if(NO_OF_STOP_BITS=="1.5" && sampling_tick_end)
+							state <= CHECK_BUFFER_EMPTY;
+						else  begin
+							state <=DONE;
+						end
+					end
+            CHECK_BUFFER_EMPTY:begin
+						if(empty)
+							state<=IDLE;
+						else begin
+							tick_start<=1'b1;
+							state <=START_BIT;
+							tx_data<=1'b1;
+							parity<=1'b0;
+							tem_buffer_data<=1'b0;
+							data_bit_counter<=3'b000;	
+						end
+							
+					end
+			endcase
+		end	
+	end
+
+	
+endmodule
+
+`timescale 1ns / 1ps
+module tx_wrapper#
+(
+	parameter  NO_OF_WORDS_IN_BUFFER =1,  //>=1
+	
+	parameter  NO_OF_DATA_BITS =8, 		 //6,7,8
+	parameter  PARITY_ENABLED  ="FALSE",  //"FALSE", "TRUE"
+	parameter  PARITY_TYPE     ="ODD",   // "ODD", "EVEN"
+	parameter  NO_OF_STOP_BITS	="1",		 //"0" "1" "1.5" "2"
+	
+	parameter  BAUD 			=230400,     //2400 4800 9600 19200 38400  57600 115200  230400
+	parameter  CLOCK_IN_MHZ	=100         //1-100MHz
+)
+(
+	input 														clk,    //system clock
+   input 														reset,
+	input[NO_OF_WORDS_IN_BUFFER*NO_OF_DATA_BITS-1:0] data_parallel_in,
+	input 														data_parallel_wr_enable,	
+	output 														tx_busy,	
+	output 														tx_data
+);
+
+
+wire sampling_tick_middle,sampling_tick_end;
+wire tick_start,data_serial_rd_enable,data_serial_out;
+wire empty;
+
+tx_buffer#
+(
+	.WORD_SIZE(NO_OF_DATA_BITS),
+	.NO_OF_WORDS(NO_OF_WORDS_IN_BUFFER)
+) ins_tx_buffer (
+    .clk(clk), 
+    .reset(reset), 
+    .data_parallel_in(data_parallel_in), 
+    .data_parallel_wr_enable(data_parallel_wr_enable), 
+    .data_serial_rd_enable(data_serial_rd_enable), 
+    .data_serial_out(data_serial_out),
+    .empty(empty)
+    );
+	 
+	 
+
+tx_fsm#(
+	.NO_OF_DATA_BITS(NO_OF_DATA_BITS),
+	.PARITY_ENABLED(PARITY_ENABLED),
+	.PARITY_TYPE(PARITY_TYPE),
+	.NO_OF_STOP_BITS(NO_OF_STOP_BITS)
+) ins_tx_fsm (
+    .clk(clk), 
+    .reset(reset), 
+	 .empty(empty),
+    .sampling_tick_middle(sampling_tick_middle), 
+    .sampling_tick_end(sampling_tick_end), 
+    .tick_start(tick_start), 
+    .data_parallel_wr_enable(data_parallel_wr_enable),
+	 .tx_busy(tx_busy),	 
+    .tx_data(tx_data), 
+    .buffer_rd_enable(data_serial_rd_enable), 
+    .buffer_data(data_serial_out)	 
+    );
+	 
+sampling_tick_generator#(	
+	.BAUD(BAUD),
+	.CLOCK_IN_MHZ(CLOCK_IN_MHZ)
+) ins_sampling_tick_generator(
+    .clk(clk), 
+    .reset(reset), 
+    .start(tick_start), 
+    .tick_16_8(sampling_tick_middle), 
+    .tick_16_16(sampling_tick_end)
+    );
+
+endmodule
+
+module uart_top #(
+	parameter  CLOCK_IN_MHZ  =100,
+	parameter  TX_WORD_LENGTH =8,   // # of UART-tramsmit data bits ; 6,7,8
+	parameter  TX_NO_OF_WORDS =1,   // Transmitter buffer size in words.
+					// Actual buffer size= 'TX_WORD_LENGTH'*'TX_WORD_LENGTH' ; 1,2...
+	parameter  RX_WORD_LENGTH =8,   // # of UART-receive data bits ; 6,7,8
+	parameter  RX_NO_OF_WORDS =1    // Receiver buffer size in words.
+					// Actual buffer size= 'RX_WORD_LENGTH'*'RX_NO_OF_WORDS'  ; 1,2.....
+)
+(
+		
+	// Interface of 'A'
+	input clk_a,
+    	input reset_a,
+	 	
+ 	input [TX_WORD_LENGTH*TX_NO_OF_WORDS-1:0] tx_parallel_data_in_a,
+ 	input  tx_data_wr_enable_in_a,
+ 	output tx_busy_out_a,
+	 	
+ 	output rx_full_a,
+ 	output [RX_WORD_LENGTH*RX_NO_OF_WORDS-1:0] rx_parallel_data_out_a,
+ 	input  rx_data_rd_enable_in_a,
+ 	output rx_parity_error_a,
+    	output rx_stop_bit_error_a,
+
+
+    	// Interface of 'B'
+    	input clk_b,
+    	input reset_b,
+	
+ 	input [TX_WORD_LENGTH*TX_NO_OF_WORDS-1:0] tx_parallel_data_in_b,
+ 	input  tx_data_wr_enable_in_b,
+ 	output tx_busy_out_b,
+	
+ 	output rx_full_b,
+ 	output [RX_WORD_LENGTH*RX_NO_OF_WORDS-1:0] rx_parallel_data_out_b,
+ 	input  rx_data_rd_enable_in_b,
+ 	output rx_parity_error_b,
+    	output rx_stop_bit_error_b
+);
+
+	wire w_a_tx_b_rx;
+	wire w_b_tx_a_rx;
+
+	uart_transceiver#(		
+		.CLOCK_IN_MHZ(CLOCK_IN_MHZ),
+		.TX_WORD_LENGTH(TX_WORD_LENGTH),
+		.TX_NO_OF_WORDS(TX_NO_OF_WORDS),
+		.RX_WORD_LENGTH(RX_WORD_LENGTH),
+		.RX_NO_OF_WORDS(RX_NO_OF_WORDS)
+	) ins_uart_transceiver_A
+	(
+	    .clk(clk_a),
+	    .reset(reset_a),
+
+		 .uart_hw_rx_pin(w_b_tx_a_rx),
+		 .uart_hw_tx_pin(w_a_tx_b_rx),
+		 
+		 .tx_parallel_data_in(tx_parallel_data_in_a),
+		 .tx_data_wr_enable_in(tx_data_wr_enable_in_a),
+		 .tx_busy_out(tx_busy_out_a),
+		 
+		 .rx_full(rx_full_a),
+		 .rx_parallel_data_out(rx_parallel_data_out_a),
+		 .rx_data_rd_enable_in(rx_data_rd_enable_in_a),
+		 .rx_parity_error(rx_parity_error_a),
+	    .rx_stop_bit_error(rx_stop_bit_error_a)		 
+	);
+
+
+	uart_transceiver#(	
+		.CLOCK_IN_MHZ(CLOCK_IN_MHZ),	
+		.TX_WORD_LENGTH(TX_WORD_LENGTH),
+		.TX_NO_OF_WORDS(TX_NO_OF_WORDS),
+		.RX_WORD_LENGTH(RX_WORD_LENGTH),
+		.RX_NO_OF_WORDS(RX_NO_OF_WORDS)
+	) ins_uart_transceiver_B
+	(
+	    .clk(clk_b),
+	    .reset(reset_b),
+
+		 .uart_hw_rx_pin(w_a_tx_b_rx),
+		 .uart_hw_tx_pin(w_b_tx_a_rx),
+		 
+		 .tx_parallel_data_in(tx_parallel_data_in_b),
+		 .tx_data_wr_enable_in(tx_data_wr_enable_in_b),
+		 .tx_busy_out(tx_busy_out_b),
+		 
+		 .rx_full(rx_full_b),
+		 .rx_parallel_data_out(rx_parallel_data_out_b),
+		 .rx_data_rd_enable_in(rx_data_rd_enable_in_b),
+		 .rx_parity_error(rx_parity_error_b),
+	    .rx_stop_bit_error(rx_stop_bit_error_b)		 
+	);
+
+
+endmodule
+
+
+`timescale 1ns / 1ps
+
+module uart_transceiver#
+(
+
+  parameter  CLOCK_IN_MHZ  =100,
+  parameter  TX_WORD_LENGTH =8,   // # of UART-tramsmit data bits ; 6,7,8
+  parameter  TX_NO_OF_WORDS =1,	  // Transmitter buffer size in words.
+				  // Actual buffer size= 'TX_WORD_LENGTH'*'TX_WORD_LENGTH' ; 1,2.....
+  parameter  RX_WORD_LENGTH =8,	  // # of UART-receive data bits ; 6,7,8
+  parameter  RX_NO_OF_WORDS =1	  // Receiver buffer size in words.
+				  // Actual buffer size= 'RX_WORD_LENGTH'*'RX_NO_OF_WORDS'  ; 1,2.....
+	
+)
+(
+    input clk,
+    input reset,
+	 input uart_hw_rx_pin,
+	 output uart_hw_tx_pin,
+	 
+	 input [TX_WORD_LENGTH*TX_NO_OF_WORDS-1:0] tx_parallel_data_in,
+	 input  tx_data_wr_enable_in,
+	 output tx_busy_out,
+	 
+	 output rx_full,
+	 output [RX_WORD_LENGTH*RX_NO_OF_WORDS-1:0] rx_parallel_data_out,
+	 input  rx_data_rd_enable_in,
+	 output rx_parity_error,
+    output rx_stop_bit_error
+	 
+);
+
+
+rx_wrapper#(
+	.NO_OF_WORS_IN_BUFFER(RX_NO_OF_WORDS),
+	.NO_OF_DATA_BITS(RX_WORD_LENGTH),
+	.PARITY_ENABLED("TRUE"),
+	.PARITY_TYPE("ODD"),
+	.NO_OF_STOP_BITS(1),
+	.BAUD(115200),
+	.CLOCK_IN_MHZ(CLOCK_IN_MHZ)
+) ins_rx_wrapper (
+    .clk(clk), 
+    .reset(reset), 
+    .rx_data(uart_hw_rx_pin), 
+    .data_parallel_out(rx_parallel_data_out), 
+    .data_parallel_rd_enable(rx_data_rd_enable_in), 
+    .rx_buffer_full(rx_full), 
+    .parity_error(rx_parity_error), 
+    .stop_bit_error(rx_stop_bit_error)
+    );
+
+tx_wrapper#(
+	.NO_OF_WORDS_IN_BUFFER(TX_NO_OF_WORDS),
+	.NO_OF_DATA_BITS(TX_WORD_LENGTH),
+	.PARITY_ENABLED("TRUE"),
+	.PARITY_TYPE("ODD"),
+	.NO_OF_STOP_BITS(1),
+	.BAUD(115200),
+	.CLOCK_IN_MHZ(CLOCK_IN_MHZ)
+) ins_tx_wrapper (
+    .clk(clk), 
+    .reset(reset), 
+    .data_parallel_in(tx_parallel_data_in), 
+    .data_parallel_wr_enable(tx_data_wr_enable_in), 
+    .tx_busy(tx_busy_out), 
+    .tx_data(uart_hw_tx_pin)
+    );
+
+
+endmodule

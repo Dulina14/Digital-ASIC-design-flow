@@ -1,0 +1,56 @@
+{
+  "baseline8": {
+    "source": "evidence/baseline8/timing.txt",
+    "path_count": 10,
+    "slacks_ps": [
+      2539,
+      2539,
+      2613,
+      2613,
+      2653,
+      2653,
+      2656,
+      2656,
+      2669,
+      2669
+    ],
+    "worst_slack_ps": 2539,
+    "scope": "Ten supplied late paths; no hold or all-corner signoff claim"
+  },
+  "width32": {
+    "source": "evidence/width32/timing.txt",
+    "path_count": 10,
+    "slacks_ps": [
+      2031,
+      2031,
+      2031,
+      2031,
+      2211,
+      2211,
+      2230,
+      2230,
+      2306,
+      2306
+    ],
+    "worst_slack_ps": 2031,
+    "scope": "Ten supplied late paths; no hold or all-corner signoff claim"
+  },
+  "clock50_load52": {
+    "source": "evidence/clock50-load52/timing.txt",
+    "path_count": 10,
+    "slacks_ps": [
+      8864,
+      8864,
+      8867,
+      8867,
+      8876,
+      8876,
+      8891,
+      8891,
+      8897,
+      8897
+    ],
+    "worst_slack_ps": 8864,
+    "scope": "Ten supplied late paths; no hold or all-corner signoff claim"
+  }
+}

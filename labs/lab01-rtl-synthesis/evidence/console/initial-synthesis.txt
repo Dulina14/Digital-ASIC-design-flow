@@ -1,0 +1,566 @@
+@genus:root: 5>  read_hdl [glob ../input/rtl/*.v]
+@genus:root: 6> elaborate uart_top
+Info    : Elaborating Design. [ELAB-1]
+        : Elaborating top-level block 'uart_top' from file '../input/rtl/uart_top.v'.
+Warning : Using default parameter value for module elaboration. [CDFG-818]
+        : Elaborating block 'uart_top' with default parameters value.
+Info    : Done Elaborating Design. [ELAB-3]
+        : Done elaborating 'uart_top'.
+Checking for analog nets...
+Check completed for analog nets.
+Checking for source RTL...
+Check completed for source RTL.
+UM:  flow.cputime  flow.realtime  timing.setup.tns  timing.setup.wns  snapshot
+UM:            45           1181                                      elaborate
+design:uart_top
+@genus:root: 7> check_design > ../log/check_design.log 
+  Checking the design.
+
+  Done Checking the design.
+@genus:root: 8> uniquify uart_top 
+@genus:root: 9> source ../input/constraints.tcl
+Sourcing '../input/constraints.tcl' (Mon Oct 05 01:44:14 EDT 2026)...
+#@ Begin verbose source input/constraints.tcl
+@file(constraints.tcl) 5: create_clock -name clk_a -period 10 [get_ports clk_a] -waveform {0 5}
+@file(constraints.tcl) 6: create_clock -name clk_b -period 10 [get_ports clk_b] -waveform {0 5}
+@file(constraints.tcl) 8: set design_inputs [get_ports {tx_parallel_data_in* tx_data_wr_enable_in* rx_data_rd_enable_in*}]
+@file(constraints.tcl) 9: set design_outputs [get_ports {tx_busy_out_* rx_full_* rx_parallel_data_out_* rx_parity_error_* rx_stop_bit_error_*}]
+@file(constraints.tcl) 11: set design_inputs_a [get_ports {tx_parallel_data_in_a tx_data_wr_enable_in_a rx_data_rd_enable_in_a}]
+@file(constraints.tcl) 12: set design_outputs_a [get_ports {tx_busy_out_a rx_full_a rx_parallel_data_out_a rx_parity_error_a rx_stop_bit_error_a}]
+@file(constraints.tcl) 14: set design_inputs_b [get_ports {tx_parallel_data_in_b tx_data_wr_enable_in_b rx_data_rd_enable_in_b}]
+@file(constraints.tcl) 15: set design_outputs_b [get_ports {tx_busy_out_b rx_full_a rx_parallel_data_out_b rx_parity_error_b rx_stop_bit_error_b}]
+@file(constraints.tcl) 17: set_clock_uncertainty 0.5 [all_clocks]
+@file(constraints.tcl) 18: set_dont_touch_network [all_clocks]
+@file(constraints.tcl) 19: set_dont_touch_network [get_ports {reset_a reset_b}]
+@file(constraints.tcl) 21: set_input_delay  6 -clock clk_a  $design_inputs_a
+@file(constraints.tcl) 22: set_input_delay  6 -clock clk_b  $design_inputs_b
+@file(constraints.tcl) 23: set_output_delay 6 -clock clk_a $design_outputs_a
+@file(constraints.tcl) 24: set_output_delay 6 -clock clk_b $design_outputs_b
+@file(constraints.tcl) 26: set_load        0.2 $design_outputs
+@file(constraints.tcl) 27: set_max_fanout  20  $design_inputs
+@file(constraints.tcl) 28: set_fanout_load 2   $design_outputs
+@file(constraints.tcl) 30: set_false_path -from [get_clocks clk_a] -to [get_clocks clk_b]
+@file(constraints.tcl) 31: set_false_path -from [get_clocks clk_b] -to [get_clocks clk_a]
+#@ End verbose source input/constraints.tcl
+exception:uart_top/dis_2
+@genus:root: 10> synthesize -to_mapped -effort m
+Warning : This command will be obsolete in a next major release. [TUI-37]
+        : command: 'synthesize'
+        : The synthesize command is obsolete. Use the syn_gen, syn_map or syn_opt commands instead.
+Current PLE settings:
+
+Aspect ratio        : 1.00
+Shrink factor       : 1.00
+Scale of res/length : 1.00
+Scale of cap/length : 1.00
+Net derating factor : 1.00
+Thermal factor      : 1.00
+Via Resistance      : 6.60 ohm (from qrc_tech_file)
+Site size           : 1.91 um (from lef [tech+cell])
+
+                                   Capacitance  
+  Layer                             / Length         Data source:
+Name        Direction Utilization  (pF/micron)       qrc_tech_file
+------------------------------------------------
+METAL_1         H         0.00        0.000210  
+METAL_2         V         1.00        0.000174  
+METAL_3         H         1.00        0.000174  
+METAL_4         V         1.00        0.000174  
+METAL_5         H         1.00        0.000174  
+METAL_6         V         1.00        0.000174  
+METAL_7         H         1.00        0.000175  
+METAL_8         V         1.00        0.000176  
+METAL_9         H         1.00        0.001240  
+METAL_10        V         1.00        0.000529  
+METAL_11        H         1.00        0.000686  
+
+                                    Resistance   
+  Layer                              / Length         Data source:
+Name        Direction Utilization  (ohm/micron)       qrc_tech_file
+-------------------------------------------------
+METAL_1         H         0.00         1.226667  
+METAL_2         V         1.00         0.755000  
+METAL_3         H         1.00         0.755000  
+METAL_4         V         1.00         0.755000  
+METAL_5         H         1.00         0.755000  
+METAL_6         V         1.00         0.755000  
+METAL_7         H         1.00         0.755000  
+METAL_8         V         1.00         0.267500  
+METAL_9         H         1.00         0.267500  
+METAL_10        V         1.00         0.097273  
+METAL_11        H         1.00         0.095455  
+
+                                        Area     
+  Layer                               / Length        Data source:
+Name        Direction Utilization     (micron)        lef_library
+-------------------------------------------------
+Metal1          H         0.00         0.060000  
+Metal2          V         1.00         0.080000  
+Metal3          H         1.00         0.080000  
+Metal4          V         1.00         0.080000  
+Metal5          H         1.00         0.080000  
+Metal6          V         1.00         0.080000  
+Metal7          H         1.00         0.080000  
+Metal8          V         1.00         0.080000  
+Metal9          H         1.00         0.080000  
+Metal10         V         1.00         0.220000  
+Metal11         H         1.00         0.220000  
+
+Info    : Synthesizing. [SYNTH-1]
+        : Synthesizing 'uart_top' to generic gates using 'medium' effort.
+Info    : Deleting instances not driving any primary outputs. [GLO-34]
+        : Deleting 2 sequential instances.
+        : Optimizations such as constant propagation or redundancy removal could change the connections so a hierarchical instance does not drive any primary outputs anymore. To see the list of deleted hierarchical instances, set the 'information_level' attribute to 2 or above. If the message is truncated set the message attribute 'truncate' to false to see the complete list. To prevent this optimization, set the 'delete_unloaded_insts' root/subdesign attribute to 'false' or 'preserve' instance attribute to 'true'.
+Info    : Deleting instances not driving any primary outputs. [GLO-34]
+        : Deleting 58 hierarchical instances.
+Info    : Pre-processed datapath logic. [DPOPT-6]
+        : No pre-processing optimizations applied to datapath logic in 'uart_top'.
+Info    : Optimizing datapath logic. [DPOPT-1]
+        : Optimizing datapath logic in 'uart_top'.
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_295'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_295'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_294'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_294'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_287'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_287'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_286'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_286'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_293'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_293'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_292'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_292'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_291'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_291'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_290'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_290'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_289'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_289'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_288'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_288'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region_285'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region_285'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Implementing datapath configurations. [DPOPT-3]
+        : Implementing datapath configurations for 'CDN_DP_region'
+Info    : Done implementing datapath configurations. [DPOPT-4]
+        : Selected 'very_fast' configuration 4 for module 'CDN_DP_region'.
+          Optimizations applied to 'very_fast' configuration:
+            rewriting(0), factoring(0), sharing(0), cmultcse(0), downsizing(0), speculation(0)
+Info    : Done optimizing datapath logic. [DPOPT-2]
+        : Done optimizing datapath logic in 'uart_top'.
+Info    : Done synthesizing. [SYNTH-2]
+        : Done synthesizing 'uart_top' to generic gates.
+Info    : Mapping. [SYNTH-4]
+        : Mapping 'uart_top' using 'medium' effort.
+Mapper: Libraries have:
+	domain _default_: 324 combo usable cells and 128 sequential usable cells
+Multi-threaded constant propagation [1|0] ...
+Info    : Replacing the synchronous part of an always feeding back flip-flop with a logic constant. [GLO-45]
+        : The instance is 'ins_uart_transceiver_A/ins_rx_wrapper/ins_rx_fsm/state_reg[3]'. The constant is '0'.
+        : To prevent this optimization, set 'optimize_constant_feedback_seqs' root attribute to 'false'. The instance attribute 'optimize_constant_feedback_seq' controls this optimization. 
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_A/ins_rx_wrapper/ins_rx_fsm/state_reg[3]'.
+        : To prevent this optimization, set the 'optimize_constant_0_flops' root attribute to 'false' or 'optimize_constant_0_seq' instance attribute to 'false'.
+Info    : Replacing the synchronous part of an always feeding back flip-flop with a logic constant. [GLO-45]
+        : The instance is 'ins_uart_transceiver_B/ins_rx_wrapper/ins_rx_fsm/state_reg[3]'. The constant is '0'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_B/ins_rx_wrapper/ins_rx_fsm/state_reg[3]'.
+Info    : Deleting instances not driving any primary outputs. [GLO-34]
+        : Deleting 2 sequential instances.
+Info    : Replacing the synchronous part of an always feeding back flip-flop with a logic constant. [GLO-45]
+        : The instance is 'ins_uart_transceiver_A/ins_rx_wrapper/ins_rx_buffer/buffer_full_counter_reg[4]'. The constant is '0'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_A/ins_rx_wrapper/ins_rx_buffer/buffer_full_counter_reg[4]'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_A/ins_rx_wrapper/ins_sampling_tick_generator/counter_reg[10]'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_A/ins_tx_wrapper/ins_sampling_tick_generator/counter_reg[10]'.
+Info    : Replacing the synchronous part of an always feeding back flip-flop with a logic constant. [GLO-45]
+        : The instance is 'ins_uart_transceiver_B/ins_rx_wrapper/ins_rx_buffer/buffer_full_counter_reg[4]'. The constant is '0'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_B/ins_rx_wrapper/ins_rx_buffer/buffer_full_counter_reg[4]'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_B/ins_rx_wrapper/ins_sampling_tick_generator/counter_reg[10]'.
+Info    : Replacing a flip-flop with a logic constant 0. [GLO-12]
+        : The instance is 'ins_uart_transceiver_B/ins_tx_wrapper/ins_sampling_tick_generator/counter_reg[10]'.
+Info    : Deleting instances not driving any primary outputs. [GLO-34]
+        : Deleting 6 sequential instances.
+Multi-threaded Virtual Mapping    (8 threads per ST process, 8 of 32 CPUs usable)
+ 
+Global mapping target info
+==========================
+Cost Group 'clk_a' target slack:    97 ps
+Target path end-point (Port: uart_top/rx_stop_bit_error_a)
+
+Cost Group 'clk_b' target slack:    97 ps
+Target path end-point (Port: uart_top/rx_stop_bit_error_b)
+
+Multi-threaded Technology Mapping (8 threads per ST process, 8 of 32 CPUs usable)
+ 
+Global mapping status
+=====================
+                                   Group   
+                                  Tot Wrst 
+                           Total  Weighted 
+Operation                   Area   Slacks  
+-------------------------------------------------------------------------------
+ global_map                 3093        0 
+
+    Cost Group            Target    Slack    Diff.  Constr.
+-----------------------------------------------------------
+         clk_a                97     2539             10000 
+         clk_b                97     2539             10000 
+
+ 
+Global incremental target info
+==============================
+Cost Group 'clk_a' target slack:    63 ps
+Target path end-point (Port: uart_top/rx_parity_error_a)
+
+Cost Group 'clk_b' target slack:    63 ps
+Target path end-point (Port: uart_top/rx_parity_error_b)
+
+ 
+Global incremental optimization status
+======================================
+                                   Group   
+                                  Tot Wrst 
+                           Total  Weighted 
+Operation                   Area   Slacks  
+-------------------------------------------------------------------------------
+ global_incr                3191        0 
+
+    Cost Group            Target    Slack    Diff.  Constr.
+-----------------------------------------------------------
+         clk_a                63     2539             10000 
+         clk_b                63     2539             10000 
+
+Info    : Done mapping. [SYNTH-5]
+        : Done mapping 'uart_top'.
+Info    : Incrementally optimizing. [SYNTH-7]
+        : Incrementally optimizing 'uart_top' using 'medium' effort.
+ 
+Incremental optimization status
+===============================
+                                   Group   
+                                  Tot Wrst     Total - - - - DRC Totals - - - -
+                           Total  Weighted      Neg      Max       Max     Max  
+Operation                   Area   Slacks      Slack    Trans      Cap   Fanout 
+-------------------------------------------------------------------------------
+ init_iopt                  3191        0         0       439        0        0
+ const_prop                 3191        0         0       439        0        0
+ simp_cc_inputs             3187        0         0       439        0        0
+ 
+Incremental optimization status
+===============================
+                                   Group   
+                                  Tot Wrst     Total - - - - DRC Totals - - - -
+                           Total  Weighted      Neg      Max       Max     Max  
+Operation                   Area   Slacks      Slack    Trans      Cap   Fanout 
+-------------------------------------------------------------------------------
+ init_delay                 3187        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+       crit_upsz         0  (        0 /        0 )  0.00
+    plc_bal_star         0  (        0 /        0 )  0.00
+     drc_buftimb         0  (        0 /        0 )  0.00
+          plc_st         0  (        0 /        0 )  0.00
+    plc_st_fence         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+      plc_laf_st         0  (        0 /        0 )  0.00
+ plc_laf_st_fence         0  (        0 /        0 )  0.00
+     drc_buftims         0  (        0 /        0 )  0.00
+   plc_laf_lo_st         0  (        0 /        0 )  0.00
+       plc_lo_st         0  (        0 /        0 )  0.00
+            fopt         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+            fopt         0  (        0 /        0 )  0.00
+        setup_dn         0  (        0 /        0 )  0.00
+         buf2inv         0  (        0 /        0 )  0.00
+             exp         0  (        0 /        0 )  0.00
+       gate_deco         0  (        0 /        0 )  0.00
+       gcomp_tim         0  (        0 /        0 )  0.00
+  inv_pair_2_buf         0  (        0 /        0 )  0.00
+
+ init_drc                   3187        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st        24  (        0 /        0 )  0.00
+        plc_star        24  (        0 /        0 )  0.00
+        drc_bufs       120  (        0 /       96 )  0.04
+        drc_fopt        24  (        0 /       24 )  0.02
+        drc_bufb        24  (        0 /        0 )  0.00
+      simple_buf        24  (        0 /        0 )  0.05
+             dup        24  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz        24  (        0 /        0 )  0.01
+
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+      drc_buf_sp         0  (        0 /        0 )  0.00
+        drc_bufs         0  (        0 /        0 )  0.00
+        drc_fopt         0  (        0 /        0 )  0.00
+        drc_bufb         0  (        0 /        0 )  0.00
+      simple_buf         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz         0  (        0 /        0 )  0.00
+
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+      drc_buf_sp         0  (        0 /        0 )  0.00
+        drc_bufs         0  (        0 /        0 )  0.00
+        drc_fopt         0  (        0 /        0 )  0.00
+        drc_bufb         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz         0  (        0 /        0 )  0.00
+
+ init_tns                   3187        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+    plc_bal_star         0  (        0 /        0 )  0.00
+     drc_buftimb         0  (        0 /        0 )  0.00
+     drc_buftims         0  (        0 /        0 )  0.00
+       crit_upsz         0  (        0 /        0 )  0.00
+   plc_laf_lo_st         0  (        0 /        0 )  0.00
+       plc_lo_st         0  (        0 /        0 )  0.00
+            fopt         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+        setup_dn         0  (        0 /        0 )  0.00
+         buf2inv         0  (        0 /        0 )  0.00
+
+ init_area                  3187        0         0       439        0        0
+ rem_buf                    3182        0         0       439        0        0
+ io_phase                   3173        0         0       439        0        0
+ glob_area                  3169        0         0       439        0        0
+ area_down                  3167        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+           undup         0  (        0 /        0 )  0.00
+         rem_buf        26  (        2 /        2 )  0.03
+         rem_inv         0  (        0 /        0 )  0.00
+        merge_bi         0  (        0 /        0 )  0.00
+      rem_inv_qb         0  (        0 /        0 )  0.00
+        io_phase         4  (        4 /        4 )  0.01
+       gate_comp         8  (        0 /        4 )  0.03
+       gcomp_mog         0  (        0 /        0 )  0.02
+       glob_area        12  (        4 /       12 )  0.05
+       area_down        44  (        2 /       11 )  0.10
+      size_n_buf         6  (        0 /        0 )  0.02
+  gate_deco_area         0  (        0 /        0 )  0.00
+         rem_buf        24  (        0 /        0 )  0.02
+         rem_inv         0  (        0 /        0 )  0.00
+        merge_bi         0  (        0 /        0 )  0.00
+      rem_inv_qb         0  (        0 /        0 )  0.00
+
+ 
+Incremental optimization status
+===============================
+                                   Group   
+                                  Tot Wrst     Total - - - - DRC Totals - - - -
+                           Total  Weighted      Neg      Max       Max     Max  
+Operation                   Area   Slacks      Slack    Trans      Cap   Fanout 
+-------------------------------------------------------------------------------
+ init_delay                 3167        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+       crit_upsz         0  (        0 /        0 )  0.00
+    plc_bal_star         0  (        0 /        0 )  0.00
+     drc_buftimb         0  (        0 /        0 )  0.00
+          plc_st         0  (        0 /        0 )  0.00
+    plc_st_fence         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+      plc_laf_st         0  (        0 /        0 )  0.00
+ plc_laf_st_fence         0  (        0 /        0 )  0.00
+     drc_buftims         0  (        0 /        0 )  0.00
+   plc_laf_lo_st         0  (        0 /        0 )  0.00
+       plc_lo_st         0  (        0 /        0 )  0.00
+            fopt         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+            fopt         0  (        0 /        0 )  0.00
+        setup_dn         0  (        0 /        0 )  0.00
+         buf2inv         0  (        0 /        0 )  0.00
+             exp         0  (        0 /        0 )  0.00
+       gate_deco         0  (        0 /        0 )  0.00
+       gcomp_tim         0  (        0 /        0 )  0.00
+  inv_pair_2_buf         0  (        0 /        0 )  0.00
+
+ init_drc                   3167        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st        24  (        0 /        0 )  0.00
+        plc_star        24  (        0 /        0 )  0.00
+        drc_bufs       120  (        0 /       96 )  0.04
+        drc_fopt        24  (        0 /       24 )  0.03
+        drc_bufb        24  (        0 /        0 )  0.00
+      simple_buf        24  (        0 /        0 )  0.05
+             dup        24  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz        24  (        0 /        0 )  0.04
+
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+        drc_bufs         0  (        0 /        0 )  0.00
+        drc_fopt         0  (        0 /        0 )  0.00
+        drc_bufb         0  (        0 /        0 )  0.00
+      simple_buf         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz         0  (        0 /        0 )  0.00
+
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+          plc_st         0  (        0 /        0 )  0.00
+        plc_star         0  (        0 /        0 )  0.00
+        drc_bufs         0  (        0 /        0 )  0.00
+        drc_fopt         0  (        0 /        0 )  0.00
+        drc_bufb         0  (        0 /        0 )  0.00
+             dup         0  (        0 /        0 )  0.00
+       crit_dnsz         0  (        0 /        0 )  0.00
+       crit_upsz         0  (        0 /        0 )  0.00
+
+ init_area                  3167        0         0       439        0        0
+
+           Trick     Calls     Accepts   Attempts    Time(secs) 
+-----------------------------------------------------------
+           undup         0  (        0 /        0 )  0.00
+         rem_buf        24  (        0 /        0 )  0.02
+         rem_inv         0  (        0 /        0 )  0.00
+        merge_bi         0  (        0 /        0 )  0.00
+      rem_inv_qb         0  (        0 /        0 )  0.00
+        io_phase         0  (        0 /        0 )  0.00
+       gate_comp         8  (        0 /        4 )  0.03
+       gcomp_mog         0  (        0 /        0 )  0.01
+       glob_area        10  (        0 /       10 )  0.04
+       area_down        38  (        0 /        9 )  0.09
+      size_n_buf         0  (        0 /        0 )  0.00
+  gate_deco_area         0  (        0 /        0 )  0.00
+
+Info    : Done incrementally optimizing. [SYNTH-8]
+        : Done incrementally optimizing 'uart_top'.
+     flow.cputime  flow.realtime  timing.setup.tns  timing.setup.wns  snapshot
+UM:            32            562                                      synthesize
+@genus:root: 11> write -mapped > ../output/uart_top.v
+@genus:root: 12> write_sdc > ../output/uart_top.sdc
+Finished SDC export (command execution time mm:ss (real) = 00:00).
+@genus:root: 13> report_area > ../report/area.log
+@genus:root: 14> report_timing  -nworst 10 > ../report/timing.log
+Warning : Possible timing problems have been detected in this design. [TIM-11]
+        : The design is 'uart_top'.
+        : Use 'report timing -lint' for more information.
+@genus:root: 15> report_port * > ../report/ports_final.log
+@genus:root: 16> report_power > ../report/power.log
+@genus:root: 17> gui_show
+no gcells found!
+@genus:root: 18> 
+Segmentation Fault accessing address a8.
+
+Fatal internal error, code 11 (Segmentation fault)
+
+Dumping stack trace (tid:7f9b673ce880/main thread).
+
+Operating System: linux
+Product Version: 18.10-p003_1
+Build Date: Jun  7 2018 23:53:27
+Executable: /data/cadence/Genus181/tools.lnx86/synth/bin/64bit/genus
+Startup Options: no options specified
+Current Directory: <CADENCE_WORKSPACE>/work
+Stack trace:
+  _ZL16fill_stack_arrayPmiRb.constprop.3
+  _Z16dump_stack_traceP8_IO_FILEbb
+  _Z8sig_exiti
+  _ZL13fatal_handleri
+  _ZL18segv_fatal_handleriP7siginfo
+  <unknown>
+  TclObjLookupVarEx
+  Tcl_GetVar2
+  haloMainWindowVisible
+  _Z20update_layout_windowv
+  _ZN9layoutWin12updateCurLocEv
+  _Z15winUpdateCurLocP7winsWin
+  _Z14winEventNotifyP7winsWiniiii
+  _ZN6winsQt14mouseMoveEventEP11QMouseEvent
+  <unknown>
+  _ZN6winsQt5eventEP6QEvent
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  <unknown>
+  tcltk_start_Tq_event_loop
+  Tcl_MainEx
+  main
+  <unknown>
+  _start
+
+Abnormal exit.

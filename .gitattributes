@@ -1,0 +1,15 @@
+* text=auto
+.gitattributes text eol=lf
+.gitignore text eol=lf
+*.md text eol=lf
+*.py text eol=lf
+*.tcl text eol=lf
+*.v text eol=lf
+*.csv text eol=lf
+*.json text eol=lf
+*.png binary
+*.pdf binary
+*.docx binary
+# Preserve captured evidence bytes so manifest hashes survive clones.
+labs/lab01-rtl-synthesis/evidence/**/*.txt -text
+labs/lab01-rtl-synthesis/netlists/uart_top_8bit_earlier.v -text
